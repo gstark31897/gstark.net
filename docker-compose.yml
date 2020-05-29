@@ -10,10 +10,34 @@ services:
      - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
      - www
+     - kanboard
+     - gitea
+
   www:
     build: ./www/
+
   kanboard:
     image: kanboard/kanboard
     volumes:
      - /etc/kanboard/data:/var/www/app/data
      - /etc/kanboard/plugins:/var/www/app/plugins
+
+  gitea:
+    image: gitea/gitea
+    restart: always
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - RUN_MODE=prod
+      - DOMAIN=gitea.gstark.net
+      - ROOT_URL=https://gitea.gstark.net/
+      - DISABLE_REGISTRATION=true
+      - REQUIRE_SIGNIN_VIEW=true
+      - SSH_PORT=222
+    volumes:
+      - /etc/gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:222"
